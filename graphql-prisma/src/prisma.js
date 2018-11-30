@@ -49,6 +49,6 @@ const updatePostForUser = async (postId, data) => {
     return user
 }
 
-updatePostForUser("cjp3adod1001l0843adi9b5le", { published: false }).then((user) => {
-    console.log(JSON.stringify(user, undefined, 2))
-})
+// updatePostForUser("cjp3adod1001l0843adi9b5le", { published: false }).then((user) => {
+//     console.log(JSON.stringify(user, undefined, 2))
+// })
