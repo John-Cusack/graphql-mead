@@ -5,50 +5,60 @@ const prisma = new Prisma({
     endpoint: 'http://localhost:4466'
 })
 
+export { prisma as default }
+
 // prisma.query prisma.mutation prisma.subscription prisma.exists
 
-const createPostForUser = async (authorId, data) => {
-    const post = await prisma.mutation.createPost({
-        data: {
-            ...data,
-            author: {
-                connect: {
-                    id: authorId
-                }
-            }
-        }
-    }, '{ id }')
-    const user = await prisma.query.user({
-        where: {
-            id: authorId
-        }
-    }, '{ id name email posts { id title published } }')
-    return user
-}
+// const createPostForUser = async (authorId, data) => {
+//     const userExists = await prisma.exists.User({ id: authorId })
 
-// createPostForUser('cjjucl3yu004x0822dq5tipuz', {
-//     title: 'Great books to read',
-//     body: 'The War of Art',
-//     published: true
-// }).then((user) => {
-//     console.log(JSON.stringify(user, undefined, 2))
-// })
+//     if (!userExists) {
+//         throw new Error('User not found')
+//     }
 
-const updatePostForUser = async (postId, data) => {
-    const post = await prisma.mutation.updatePost({
-        where: {
-            id: postId
-        },
-        data
-    }, '{ author { id } }')
-    const user = await prisma.query.user({
-        where: {
-            id: post.author.id
-        }
-    }, '{ id name email posts { id title published } }')
-    return user
-}
+//     const post = await prisma.mutation.createPost({
+//         data: {
+//             ...data,
+//             author: {
+//                 connect: {
+//                     id: authorId
+//                 }
+//             }
+//         }
+//     }, '{ author { id name email posts { id title published } } }')
 
-// updatePostForUser("cjp3adod1001l0843adi9b5le", { published: false }).then((user) => {
-//     console.log(JSON.stringify(user, undefined, 2))
-// })
+//     return post.author
+// }
+
+// // createPostForUser('cjjybkwx5006h0822n32vw7dj', {
+// //     title: 'Great books to read',
+// //     body: 'The War of Art',
+// //     published: true
+// // }).then((user) => {
+// //     console.log(JSON.stringify(user, undefined, 2))
+// // }).catch((error) => {
+// //     console.log(error.message)
+// // })
+
+// const updatePostForUser = async (postId, data) => {
+//     const postExists = await prisma.exists.Post({ id: postId })
+
+//     if (!postExists) {
+//         throw new Error('Post not found')
+//     }
+
+//     const post = await prisma.mutation.updatePost({
+//         where: {
+//             id: postId
+//         },
+//         data
+//     }, '{ author { id name email posts { id title published } } }')
+    
+//     return post.author
+// }
+
+// // updatePostForUser("power", { published: true }).then((user) => {
+// //     console.log(JSON.stringify(user, undefined, 2))
+// // }).catch((error) => {
+// //     console.log(error.message)
+// // })
