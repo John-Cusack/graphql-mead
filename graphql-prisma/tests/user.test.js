@@ -8,18 +8,18 @@ const client = getClient()
 
 beforeEach(seedDatabase)
 const createUser = gql `
-mutation($data: CreateUserInput) {
-    createUser(
-        data: $data
-    ){
-        token
-        user {
+    mutation($data: CreateUserInput) {
+        createUser(
+            data: $data
+        ){
             token
-            name
-            email
+            user {
+                token
+                name
+                email
+            }
         }
     }
-}
 `
 test('should create new user', async () => {
     const variables = {
