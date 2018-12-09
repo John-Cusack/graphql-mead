@@ -3,3 +3,4 @@ docker-compose.yml
 prod.env
 dist/
 config/
+.cache

@@ -9,6 +9,10 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "parcel-bundler": "^1.9.7"
+    "parcel-bundler": "^1.10.3"
+  },
+  "dependencies": {
+    "apollo-boost": "^0.1.14",
+    "graphql": "^14.0.2"
   }
 }
