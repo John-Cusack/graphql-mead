@@ -1,40 +1,67 @@
 import prisma  from '../../src/prisma'
+import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 
+const userOne = {
+    input: {
+        name: 'jen',
+        email: 'jen@emaple.com',
+        password: bcrypt.hashSync('09asdf0df')
+    },
+    user: undefined,
+    jwt: undefined
+}
+
+const postOne = {
+    input: {
+        title: "My second post",
+        body: "man this is not as good as the first one",
+        published: false
+    },
+    post: undefined
+}
+
+const postTwo = {
+    input: {
+        title: "My first post",
+        body: "man this is good",
+        published: true,
+    },
+    post: undefined
+}
+
 const seedDatabase = async () => {
+    //delete old test data
     await prisma.mutation.deleteManyPosts()
     await prisma.mutation.deleteManyUsers()
-    const user = await prisma.mutation.createUser({
-        data: {
-            name: 'jen',
-            email: 'jen@emaple.com',
-            password: bcrypt.hashSync('09asdf0df')
-        }
+
+    //create user one
+    userOne.user = await prisma.mutation.createUser({
+        data: userOne.input
     })
-    await prisma.mutation.createPost({
+    userOne.jwt = jwt.sign({userId: userOne.user.id}, process.env.JWT_SECRET)
+    //create postOne
+    postOne.post = await prisma.mutation.createPost({
         data: {
-            title: "My first post",
-            body: "man this is good",
-            published: true,
+            ...postOne.input,
             author: {
                 connect: {
-                    id: user.id
+                    id: userOne.user.id
                 }
             }
         }
     })
-    await prisma.mutation.createPost({
+
+    postTwo.post = await prisma.mutation.createPost({
         data: {
-            title: "My second post",
-            body: "man this is not as good as the first one",
-            published: false,
+            ...postTwo.input,
             author: {
                 connect: {
-                    id: user.id
+                    id: userOne.user.id
                 }
             }
         }
     })
 }
 
-export {seedDatabase as default} 
+export {seedDatabase as default, userOne, postOne, postTwo} 

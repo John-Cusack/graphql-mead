@@ -1,34 +1,38 @@
 import 'cross-fetch/polyfill'
-import ApolloBoost, {gql} from 'apollo-boost'
+import {gql} from 'apollo-boost'
 import prisma  from '../src/prisma'
-import seedDatabase from './utils/seedDatabase'
+import seedDatabase, {userOne} from './utils/seedDatabase'
+import getClient from './utils/getClient'
 
-const client = new ApolloBoost({
-    uri: 'http://localhost:4000'
-})
+const client = getClient()
 
 beforeEach(seedDatabase)
-
-test('should create new user', async () => {
-    const createUser = gql `
-        mutation {
-            createUser(
-                data: {
-                    name: "John",
-                    email: "john@gmail.com",
-                    password: "mypass123"
-                }
-            ){
-                token,
-                user {
-                    id
-                }
-            }
+const createUser = gql `
+mutation($data: CreateUserInput) {
+    createUser(
+        data: $data
+    ){
+        token
+        user {
+            token
+            name
+            email
         }
-    `
+    }
+}
+`
+test('should create new user', async () => {
+    const variables = {
+        data: {
+            name: 'andrew',
+            email: 'andrew@gmail.com',
+            password: 'asdfoaudfafas'
+        }
+    }
 
     const response = await client.mutate({
-        mutation:createUser
+        mutation:createUser,
+        variables
     })
 
     const exists = await prisma.exists.User({id: response.data.createUser.user.id})
@@ -60,7 +64,7 @@ test('should not login with bad creditials', async () => {
             login(
                 data: {
                     email: "jeff@we.com",
-                    password: "asdf;alkdfj"
+                    password: "asdfasfalkdfj"
                 }
             ){
                     token
@@ -90,4 +94,21 @@ test('should not sign up suser with invalid pasword', async () => {
     await expect(
         client.mutate({mutation: createUser})
     ).rejects.toThrow()
+})
+
+test('Should fetch user profile', async () => {
+    const client = getClient(userOne.jwt)
+    const getProfile = gql`
+        query {
+            me {
+                id
+                name
+                email
+            }
+        }
+    `
+    const {data} = await client.query({query: getProfile})
+    expect(data.me.id).toBe(userOne.user.id)
+    expect(data.me.name).toBe(userOne.user.name)
+    expect(data.me.email).toBe(userOne.user.email)
 })
